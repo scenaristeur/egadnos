@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/egadnos/precache-manifest.5b63b4a69449dabd2148e9d3e46bbdb6.js"
+  "/egadnos/precache-manifest.ae9f53c824082c3dbb684891c708cc27.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "egadnos"});

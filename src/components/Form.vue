@@ -1,6 +1,6 @@
 <template>
   <div>
-    Form
+    <h3>Formulaire satisfaction du service : </h3>
     <div v-for="q in questions" :key="q.id" class="mb-3">
       <h5>{{q.texte}}</h5>
       <Choice :question="q" @select="onSelect"/>
