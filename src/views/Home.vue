@@ -1,7 +1,9 @@
 <template>
   <div class="home">
     <img alt="Vue logo" src="../assets/logo.png">
-    <Form />
+    <b-container class="form-container">
+      <Form />
+    </b-container>
     <HelloWorld msg="Welcome to Your Vue.js App"/>
   </div>
 </template>
@@ -19,3 +21,8 @@ export default {
   }
 }
 </script>
+<style>
+.form-container{
+  text-align: left;
+}
+</style>
