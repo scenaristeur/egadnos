@@ -1,14 +1,16 @@
 <template>
-  <div>
+  <b-row>
+    <b-col md
+    v-for="l in likert" :key="l.id">
     <b-button
     class="button"
-    v-for="l in likert" :key="l.id"
     :pressed.sync="l.state"
     variant="outline-secondary"
     @click="select(l)"
-    size="sm"
+
     >{{l.texte}}</b-button>
-  </div>
+  </b-col>
+</b-row>
 </template>
 
 <script>
@@ -17,7 +19,7 @@ export default {
   props: ['question'],
   created(){
     this.q = this.question
-    this.q.result = this.likert[3] //initialisation du resultat au neutre
+  this.q.result = this.likert[2] //initialisation du resultat au neutre
   },
   data(){
     return{

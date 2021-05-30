@@ -1,10 +1,46 @@
 <template>
   <div>
-    <h3>Formulaire satisfaction du service : </h3>
-    <div v-for="q in questions" :key="q.id" class="mb-3">
-      <h5>{{q.texte}}</h5>
-      <Choice :question="q" @select="onSelect"/>
-    </div>
+    <center>
+      <img alt="Vue logo" :src="service.logo" style="max-width:90vw;max-height:400px" class="mb-3">
+    </center>
+    <h3>Formulaire satisfaction du service <b><a :href="service.url" target="_blank">{{service.name}}</a></b> </h3>
+    <p> proposé par<br> <a :href="service.pod" target="_blank">{{service.pod}}</a></p>
+
+    <p v-if="service.confidentialite && service.confidentialite == 'public'">
+      !!! Les résultats de ce sondage seront publics !!!
+    </p>
+    <p v-else>
+      !!! Les résultats de ce sondage sont à accès limités, seul {{service.pod}} y a accès !!! </p>
+
+
+      <div v-for="q in questions" :key="q.id" class="mb-3">
+        <h5>{{q.texte}}</h5>
+        <Choice :question="q" @select="onSelect"/>
+      </div>
+
+
+      <b-form-textarea
+      id="textarea"
+      v-model="complement"
+      placeholder="Si vous souhaitez ajouter un complement d'information..."
+      rows="3"
+      max-rows="6"
+      ></b-form-textarea>
+
+      <b-form-group
+      id="input-group-1"
+      label="WebId / email / nom / telephone :"
+      label-for="input-1"
+      description="Indiquez votre WebId si vous souhaitez stocker les informations sur votre POD / ou email, nom, telephone si vous autorisez l'auteur à reprendre contact avec vous ."
+      >
+      <b-form-input
+      id="input-1"
+      v-model="auteur"
+      type="text"
+      placeholder="Votre WebId / nom / email / telephone ou `Anonyme`"
+      required
+      ></b-form-input>
+    </b-form-group>
 
     <b-button @click="valider" variant="primary">Valider</b-button>
     <hr>
@@ -22,15 +58,16 @@
 
 <script>
 import Choice from '@/components/Choice.vue'
+import { saveFileInContainer, getSourceUrl } from "@inrupt/solid-client";
 
 export default {
   name: 'Form',
+  props: ['service'],
   components: {
     Choice,
   },
   data(){
     return{
-      score: 0,
       questions: [
         {id: "frequence", texte:"1. Je pense que vais utiliser le service fréquemment", consonnance: "positive"},
         {id: "complexite", texte:"2. Je pense que le service est inutilement complexe", consonnance: "negative"},
@@ -42,11 +79,14 @@ export default {
         {id: "lourdeur", texte:"8. Je trouve le service vraiment très lourd à utiliser", consonnance: "negative"},
         {id: "confiance", texte:"9. Je me suis senti très confiant en utilisant ce service", consonnance: "positive"},
         {id: "prerequis", texte:"10. J’ai dû apprendre beaucoup de choses avant de pouvoir utiliser ce service", consonnance: "negative"},
-      ]
+      ],
+      score: 0,
+      auteur: "",
+      complement: ""
     }
   },
   methods:{
-    valider(){
+    async valider(){
       //  console.log("quesions", this.questions)
       let tmp_score = 0
 
@@ -62,8 +102,29 @@ export default {
       });
       this.score = tmp_score * 2.5
       //  console.log("score : ",this.score )
-      let resultat = {questions: this.questions, score: this.score}
+      let resultat = {questions: this.questions,
+        score: this.score,
+        auteur: this.auteur,
+        service: this.service,
+        complement: this.complement,
+        date: new Date()
+      }
       console.log("resultat",resultat)
+      let container = this.service.confidentialite == 'public' ? this.service.pod+"/public/egadnos/" : this.service.pod+"/egadnos/"
+      console.log(container)
+
+      let slug = this.service.name+'.json'
+
+      const savedFile = await saveFileInContainer(
+        container,
+        new Blob([JSON.stringify(resultat)],
+        //  resultat,
+        { type: "application/json" }),
+        { slug:  slug}
+      );
+
+      console.log(`File saved at ${getSourceUrl(savedFile)}`);
+
 
 
       /*  Comment calculer le score SUS ?

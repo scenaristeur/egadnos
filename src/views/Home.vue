@@ -1,10 +1,11 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
+
     <b-container class="form-container">
-      <Form />
+      <Form v-if="service!= null" :service="service"/>
+
+      <HelloWorld msg="Bienvenu.e sur Egadnos, le sondage ethique"/>
     </b-container>
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
   </div>
 </template>
 
@@ -18,11 +19,36 @@ export default {
   components: {
     HelloWorld,
     Form
+  },
+  data(){
+    return{
+      service: null
+    }
+  },
+  async created(){
+    this.checkQuery()
+  },
+  watch:{
+    $route (){
+      this.checkQuery()
+    },
+  },
+  methods:{
+    checkQuery(){
+      if(this.$route.query.service){
+        try{
+          this.service = JSON.parse(decodeURIComponent(this.$route.query.service))
+          console.log(this.service)
+        }catch(e){
+          console.log(e,"service inexploitable", this.$route.query.service)
+        }
+      }
+    },
   }
 }
 </script>
 <style>
-.form-container{
+.home{
   text-align: left;
 }
 </style>
